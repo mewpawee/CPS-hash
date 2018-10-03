@@ -5,7 +5,8 @@
 
 #include "DHT.h"
 
-#define DHTPIN 2     // what digital pin we're connected to
+#define DHTPIN 2     // Humidity and Temperature pin
+#define WATER_SENSOR 7 // Water sensor pin
 
 // Uncomment whatever type you're using!
 //#define DHTTYPE DHT11   // DHT 11
@@ -45,6 +46,7 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I
 void setup()   /*----( SETUP: RUNS ONCE )----*/
 {
   Serial.begin(9600);  // Used to type in characters
+  pinMode(WATER_SENSOR, INPUT);
   dht.begin();
   lcd.begin(20,4);   // initialize the lcd for 16 chars 2 lines, turn on backlight
 
@@ -66,14 +68,18 @@ lcd.clear();
 
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 {
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  float temp = dht.readTemperature();
+  float water = digitalRead(WATER_SENSOR);
   lcd.setCursor(0,0);
   lcd.print("Humidity: ");
-  lcd.print(h);
+  lcd.print(humidity);
   lcd.setCursor(0,1);
   lcd.print("Temperature: ");
-  lcd.print(t);
+  lcd.print(temp);
+  lcd.setCursor(0,2);
+  lcd.print("Water: ");
+  lcd.print(water);
   
   delay(2000);
 
