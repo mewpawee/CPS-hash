@@ -2,7 +2,12 @@
  16 character 2 line I2C Display
  Backpack Interface labelled "YwRobot Arduino LCM1602 IIC V1"
  terry@yourduino.com */
-int lebPin = 13;
+int ledPin = 13;
+int maxHum = 100;
+int maxTemp = 40;
+int minTemp = 10;
+int minHum = 10;
+
 #include "DHT.h"
 
 #define DHTPIN 2     // Humidity and Temperature pin
@@ -12,7 +17,7 @@ int lebPin = 13;
 //#define DHTTYPE DHT11   // DHT 11
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
-
+#define fan 4 
 // Connect pin 1 (on the left) of the sensor to +5V
 // NOTE: If using a board with 3.3V logic like an Arduino Due connect pin 1
 // to 3.3V instead of 5V!
@@ -74,15 +79,17 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
   float humidity = dht.readHumidity();
   float temp = dht.readTemperature();
   float water = digitalRead(WATER_SENSOR);
-  if temp > 28 {
-    digitalWrite(ledPin,HIGH);
-    digitalWrite(fan,HIGH);
+  
+  if temp >  maxTemp { /*temp greater than maximum*/ /*set delay*/
+    digitalWrite(fan,HIGH)
+  }else{
+    digitalWrite(fan,LOW)
   }
-  if humidity > 100 {
-    digitalWrite(ledPin,HIGH)
-    digitalWrite(solenoid, HIGH)
-  }
-    
+  if temp < minTemp{ /*temp less than minimum temp*/ /*set delay*/
+    digitalWrite(ledPin,HIGH)      
+  }else{
+    digitalWrite(ledPin,LOW)
+  }   
   
   lcd.setCursor(0,0);
   lcd.print("Humidity: ");
