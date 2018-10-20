@@ -9,13 +9,14 @@
 /*--------------------------------------*/
 
 /*------------Define Things-------------*/
-#define DHTPIN 2        // Humidity and Temperature on pin 2
-#define WATER_SENSOR 7  // Water sensor  on pin 7
-#define Solenoid 10     // Solenoid on pin 10
-#define fan 4           // fan on pin 4
-#define light 13       //  light on pin 13
-#define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
-DHT dht(DHTPIN, DHTTYPE); //Set up DHT
+#define DHTPIN 2            // Humidity and Temperature on pin 2
+#define WATER_SENSOR 7      // Water sensor  on pin 7
+#define Solenoid 10         // Solenoid on pin 10
+#define fan 4               // fan on pin 4
+#define fan2 5              // second fan on pin 5
+#define light 3             //  light on pin 3
+#define DHTTYPE DHT22       // DHT 22  (AM2302), AM2321  
+DHT dht(DHTPIN, DHTTYPE);
 /*--------------------------------------*/
 
 /*-----( Declare Constants )-----*/
@@ -29,9 +30,9 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I
 /*-----( Declare Variables )-----*/
 int maxHum = 100;
 int minHum = 10;
-int maxTemp = 40;
-int minTemp = 10;
-/*--------------------------------*/
+float maxTemp = 37.00;
+float minTemp = 27.00;
+/*-------------------------*/
 
 
 void setup()   /*----( SETUP: RUNS ONCE )----*/
@@ -40,7 +41,8 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
   pinMode(light, OUTPUT);        // set ledPin as OUTPUT
   pinMode(WATER_SENSOR, INPUT);   // set WATER_SENSOR as INPUT
   pinMode(Solenoid,OUTPUT);       // set Solenoid as OUTPUT
-  
+  pinMode(fan, OUTPUT);
+  pinMode(fan2, OUTPUT);
   dht.begin();       // Strat dht
   lcd.begin(20,4);   // initialize the lcd for 16 chars 2 lines, turn on backlight
 
@@ -57,18 +59,21 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 {
+  digitalWrite(fan,HIGH);                         // turn the fan on
   float humidity = dht.readHumidity();            // get humidity from dht
   float temp = dht.readTemperature();             // get temp from dht
   float water = digitalRead(WATER_SENSOR);        // get water from WATER_SENSOR
 
-
+ 
   /*---------Logic Part-----------*/
-  if(temp >  maxTemp){ /*temp greater than maximum*/ /*set delay*/
-    digitalWrite(fan,HIGH);
-  }else{
-    digitalWrite(fan,LOW); 
-  }
-  if(temp < minTemp){ /*temp less than minimum temp*/ /*set delay*/
+//  if(temp >  maxTemp){ /*temp greater than maximum*/ /*set delay*/
+//    
+//    digitalWrite(fan2,HIGH);   
+//  }else{
+//     
+//    digitalWrite(fan2,LOW);
+//  }
+  if(temp <= maxTemp){ /*temp less than minimum temp*/ /*set delay*/
     digitalWrite(light,HIGH);      
   }else{
     digitalWrite(light,LOW);
