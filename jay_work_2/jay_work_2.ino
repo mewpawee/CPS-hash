@@ -69,9 +69,9 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 bool rotate_egg(int state)
 {   
            
-    int steps = 10;
+    int steps = 120;
     if(state==false){
-       steps = -30;
+       steps = -120;
     }
     motor.step(steps);
     delay(500);
@@ -138,4 +138,3 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 
 
 /* ( THE END ) */
-
