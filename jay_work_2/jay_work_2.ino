@@ -12,9 +12,10 @@
 /*------------Define Things-------------*/
 #define DHTPIN 2            // Humidity and Temperature on pin 2
 #define WATER_SENSOR 7      // Water sensor  on pin 7
+#define rotate_switch 6      // Rotate switch on pin 6
 #define Solenoid 10         // Solenoid on pin 10
 #define fan 4               // fan on pin 4
-#define fan2 5              // second fan on pin 5
+#define fan1 5              // second fan on pin 5
 #define light 3             //  light on pin 3
 #define DHTTYPE DHT22       // DHT 22  (AM2302), AM2321  
 DHT dht(DHTPIN, DHTTYPE);
@@ -29,16 +30,14 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I
 /*--------------------------------*/
 
 /*-----( Declare Variables )-----*/
-int maxHum = 100;
-int minHum = 10;
+float maxHum = 58.00;
 float maxTemp = 37.00;
-float minTemp = 27.00;
 bool egg_state = true;
 /*---------------------------------*/ /*stepper*/
-int in1Pin = 6;
-int in2Pin = 1;
-int in3Pin = 8;
-int in4Pin = 9;
+int in1Pin = 10;
+int in2Pin = 11;
+int in3Pin = 12;
+int in4Pin = 13;
 Stepper motor(512, in1Pin, in3Pin, in2Pin, in4Pin);
 /*-------------------------*/
 
@@ -46,11 +45,12 @@ Stepper motor(512, in1Pin, in3Pin, in2Pin, in4Pin);
 void setup()   /*----( SETUP: RUNS ONCE )----*/
 {
   Serial.begin(9600);             // Used to type in characters
+  pinMode(rotate_switch, INPUT);
   pinMode(light, OUTPUT);        // set ledPin as OUTPUT
   pinMode(WATER_SENSOR, INPUT);   // set WATER_SENSOR as INPUT
   pinMode(Solenoid,OUTPUT);       // set Solenoid as OUTPUT
   pinMode(fan, OUTPUT);
-  pinMode(fan2, OUTPUT);
+  pinMode(fan1, OUTPUT);
   dht.begin();       // Strat dht
   lcd.begin(20,4);   // initialize the lcd for 16 chars 2 lines, turn on backlight
 
@@ -67,16 +67,30 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 }/*------------------(end setup )------------------*/
 
 bool rotate_egg(int state)
-{
-    int steps = 360;
+{   
+           
+    int steps = 10;
+    if(state==false){
+       steps = -30;
+    }
     motor.step(steps);
     delay(500);
-    return !state
+    return !state;
   }
+  
+void check_humid(float humid,float maxHum){
+  if(humid >= maxHum){
+    digitalWrite(fan,HIGH);
+    digitalWrite(fan1,HIGH);
+  }else{
+    digitalWrite(fan,LOW);
+    digitalWrite(fan1,LOW);
+    }
+  }  
   
 void check_temp(float temp,float maxTemp)
 {
-  if(temp <= maxTemp){ /*temp less than minimum temp*/ /*set delay*/
+  if(temp <= maxTemp ){ /*temp less than minimum temp*/ /*set delay*/
     digitalWrite(light,HIGH);      
   }else{
     digitalWrite(light,LOW);
@@ -85,15 +99,18 @@ void check_temp(float temp,float maxTemp)
     
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 {
-  digitalWrite(fan,HIGH);                         // turn the fan on
-  float humidity = dht.readHumidity();            // get humidity from dht
+  float humid = dht.readHumidity();            // get humidity from dht
   float temp = dht.readTemperature();             // get temp from dht
   float water = digitalRead(WATER_SENSOR);        // get water from WATER_SENSOR
 
  
   /*---------Logic Part-----------*/
   check_temp(temp,maxTemp);
-  eggstate = rotate_egg(egg_state);
+  check_humid(humid,maxHum);
+  bool is_switch = digitalRead(rotate_switch);
+  if (is_switch==HIGH){
+    egg_state = rotate_egg(egg_state);
+  }
   /*--------------------------------*/
 
   /*-----------------------------*/ /*stepper part*/
@@ -101,18 +118,21 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
   /*Display Part*/
   //Show humidity in line 1
   lcd.setCursor(0,0);
-  lcd.print("Humidity: ");
-  lcd.print(humidity);
+  lcd.print("H: ");
+  lcd.print(humid);
   //-----------------------
-  //Show Temperature in line 2
-  lcd.setCursor(0,1);
-  lcd.print("Temperature: ");
+  //Show Temperature in line 2;
+  lcd.print(" T: ");
   lcd.print(temp);
   //-----------------------
   //Show Water in line 3
-  lcd.setCursor(0,2);
+  lcd.setCursor(0,1);
   lcd.print("Water: ");
   lcd.print(water);
+  //
+  lcd.setCursor(0,2);
+  lcd.print("Turn: ");
+  lcd.print(egg_state);
   delay(1000); //each loop delay for 1 second
 }/* --(end main loop )-- */
 
