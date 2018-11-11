@@ -30,8 +30,8 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I
 /*--------------------------------*/
 
 /*-----( Declare Variables )-----*/
-float maxHum = 58.00;
-float maxTemp = 37.00;
+float maxHum = 67.5;
+float maxTemp = 36.50;
 bool egg_state = true;
 /*---------------------------------*/ /*stepper*/
 int in1Pin = 10;
@@ -95,7 +95,7 @@ void check_temp(float temp,float maxTemp)
   }else{
     digitalWrite(light,LOW);
   }   
-   } 
+} 
     
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 {
@@ -114,7 +114,17 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
   /*--------------------------------*/
 
   /*-----------------------------*/ /*stepper part*/
-
+  /*if(temp == "nan")
+  {
+    exit();
+  }*/
+  Serial.println(temp);
+  Serial.println(humid);
+  Serial.println(water);
+  if(isnan(temp)==1)
+  {
+    return;
+  }
   /*Display Part*/
   //Show humidity in line 1
   lcd.setCursor(0,0);
