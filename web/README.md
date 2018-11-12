@@ -2,6 +2,7 @@ Hi > w<
 This folder will contain all the website stuff.
 
 Requirement
+``` apt-get update apache2 ```
 Apache2
 PHP
 PHPmyAdmin
