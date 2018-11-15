@@ -13,7 +13,7 @@
     $query = mysqli_query($con,$query);
 
 
-    echo 'inserted';
+    echo 'Data is inserted';
     
 
 	//USE CASE  -> localhost/upload.php?humidity="Your humidity"&temperature="Your Temp"
