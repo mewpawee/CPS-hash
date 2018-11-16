@@ -35,7 +35,7 @@
     <title>Kinaree Egg</title>
 
     <!-- Bootstrap core CSS-->
-    <link href="https://shareport.ikirize.net/client/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <!-- Custom fonts for this template-->
     <link href="https://shareport.ikirize.net/client/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -116,8 +116,8 @@
 
 
     <!-- Bootstrap core JavaScript-->
-    <script src="https://shareport.ikirize.net/client/vendor/jquery/jquery.min.js"></script>
-    <script src="https://shareport.ikirize.net/client/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" integrity="sha384-pjaaA8dDz/5BgdFUPX6M/9SUZv4d12SUPF0axWc+VRZkx5xU3daN+lYb49+Ax+Tl" crossorigin="anonymous"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="https://shareport.ikirize.net/client/vendor/jquery-easing/jquery.easing.min.js"></script>
