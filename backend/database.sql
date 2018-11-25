@@ -30,8 +30,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `egg` (
   `id` int(11) NOT NULL,
-  `humidity` varchar(4) NOT NULL,
+  `humidity` varchar(5) NOT NULL,
   `temp` varchar(5) NOT NULL,
+  `light` int(1) NOT NULL,
+  `humidifier` int(1) NOT NULL,
+  `position`  int(1) NOT NULL,
   `date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

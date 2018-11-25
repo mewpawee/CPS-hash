@@ -1,21 +1,17 @@
 // include outside libraries
 #include "Camera_Exp.h"
 #include <WiFi.h>
+
 //------------------------//
 char fromArd[18]; //Initialized variable to store recieved data from Arduino
 HardwareSerial & commu = Serial; // declare commu as Serial
 CAMERA cam;
 
-char ssid[] = "CIE2";      //  your network SSID (name)
-char pass[] = "1212312121";   // your network password
-WiFiServer server(80);
+char ssid[] = "mine";      //  your network SSID (name)
+char pass[] = "12345678";   // your network password
 
-String http_header = "HTTP/1.1 200 OK\r\n";
-String http_stream = "Content-type: multipart/x-mixed-replace; boundary=123456789000000000000987654321\r\n\r\n";
-String http_jpg = "Content-type: image/jpg\r\n\r\n";
-String http_boundary = "--123456789000000000000987654321\r\n";
 WiFiClient client;
-//---------------------------------
+//--------------------------------
 
 void setup() {
   commu.begin(9600); // Begin the commu Serial at 9600 Baud
@@ -27,9 +23,7 @@ void setup() {
     Serial.print("try to connect wifi........");
   }
   //-------------------------------------------//
-  server.begin();
-  cam.setFrameSize(CAMERA_FS_VGA);
-  esp_err_t err = cam.init();
+
   Serial.print(WiFi.localIP());
 }
 
@@ -37,9 +31,9 @@ void loop() {
   /*Initialize data if getting trouble on connection*/
   float hum = 0.00;
   float temp = 0.00;
-  int light_status = 0;
-  int humidifier_status = 0;
-  int tray_pos = 0;
+  int light_status = 1;
+  int humidifier_status = 1;
+  int tray_pos = 1;
   
   /* Reading from Arduino*/
   commu.readBytes(fromArd,18);    //reading data from Arduino
@@ -52,6 +46,32 @@ void loop() {
     tray_pos = message.substring(16,17).toInt();           //Cut 16 positions of String to be tray_pos
   }
   
+  //upload data to server
+  const uint16_t port = 8080;
+  const char * host = "101.108.210.15"; // ip or dns
+  
+  //Use WiFiClient class to create TCP connections
+  WiFiClient client;
+  
+  // This will send the request to the server
+  if (!client.connect(host, port)) {
+        Serial.print("nah");
+        delay(5000);
+        return;
+  }
+  String url_1 = "/upload.php?humidity=";
+  String url_2 = "&temperature=";
+  String url_3 = "&light=";
+  String url_4 = "&humidifier=";
+  String url_5 = "&position=";
+  String hum_url = String(hum);
+  String temp_url = String(temp);
+  String light_url = String(light_status);
+  String humidifier_url = String(humidifier_status);
+  String position_url = String(tray_pos);
+  client.print(String("GET ") + url_1 + hum_url + url_2 + temp_url + url_3 + light_url + url_4 + humidifier_url + url_5 + position_url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "Connection: close\r\n\r\n");
+  client.stop();
+  
   //set what to send back to arduino(get from website)
   float set_humid = 58.00;
   float set_temp = 37.00;
@@ -63,53 +83,6 @@ void loop() {
   String msg = String(set_humid)+"/"+String(set_temp)+"/"+String(set_light)+"/"+String(set_humidifier)+"/"+String(set_tray)+"/";
   const char *toArd = msg.c_str();
   commu.write(toArd);
-
-  /*create it own server*/
-  String httpreq;
-  client = server.available();
-  if (client)
-  {
-    Serial.println("New Client.");
-    String httpreq = "";
-    while (client.connected())
-    {
-      if (client.available())
-      {
-        String httpreq_line = client.readStringUntil('\n');
-        httpreq += httpreq_line;
-        if (httpreq_line == "\r")
-        {
-          if (httpreq.indexOf("GET /capture") != -1)
-          {
-                Serial.println("Capture");
-                capture();
-          }
-          
-          httpreq = "";
-          client.stop();
-        }
-
-      }
-    }
-
-  }
   delay(1000);
 }  
-//----------------------------//
-
-//----function to capture a picture-----//
-void capture()
-{
-   esp_err_t err;
-    err = cam.capture();
-    if (err != ESP_OK)
-    {
-      Serial.println("Camera capture failed with error =" + String(err));
-      return;
-    }
-   client.print(http_header);
-   client.print(http_jpg);
-   client.write(cam.getfb(),cam.getSize());
-   
-}
 //----------------------------//
