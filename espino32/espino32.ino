@@ -7,14 +7,15 @@ char fromArd[18]; //Initialized variable to store recieved data from Arduino
 HardwareSerial & commu = Serial; // declare commu as Serial
 CAMERA cam;
 
-char ssid[] = "mine";      //  your network SSID (name)
-char pass[] = "12345678";   // your network password
+char ssid[] = "CIE2";      //  your network SSID (name)
+char pass[] = "1212312121";   // your network password
 
 WiFiClient client;
 //--------------------------------
 
 void setup() {
-  commu.begin(9600); // Begin the commu Serial at 9600 Baud
+  commu.begin(115200); // Begin the commu Serial at 9600 Baud
+  commu.setTimeout(1000);
   WiFi.begin(ssid,pass);
 
   //--------Block loop for connecting wifi-----//
@@ -36,8 +37,10 @@ void loop() {
   int tray_pos = 1;
   
   /* Reading from Arduino*/
-  commu.readBytes(fromArd,18);    //reading data from Arduino
-  if(*fromArd != '\0'){
+//  commu.readBytes(fromArd,18);    //reading data from Arduino
+//  if(*fromArd != '\0'){
+  while(commu.available()){
+    commu.readBytes(fromArd,18);
     String message = String(fromArd);                      //Change what we get from Arduino to string
     hum = message.substring(0,5).toFloat();                //Cut 0-4 positions of String to be hum
     temp = message.substring(6,11).toFloat();              //Cut 6-10 positions of String to be temp
@@ -47,19 +50,20 @@ void loop() {
   }
   
   //upload data to server
-  const uint16_t port = 8080;
-  const char * host = "101.108.210.15"; // ip or dns
+  const uint16_t port = 80;
+  const char * host = "www.arbsuwan.com"; // ip or dns
   
   //Use WiFiClient class to create TCP connections
   WiFiClient client;
   
   // This will send the request to the server
-  if (!client.connect(host, port)) {
-        Serial.print("nah");
-        delay(5000);
-        return;
-  }
-  String url_1 = "/upload.php?humidity=";
+//  if (!client.connect(host, port)) {
+//        Serial.print("nah");
+//        delay(5000);
+//        return;
+//  }
+  client.connect(host, port);
+  String url_1 = "/kinaree/upload.php?humidity=";
   String url_2 = "&temperature=";
   String url_3 = "&light=";
   String url_4 = "&humidifier=";
@@ -73,8 +77,8 @@ void loop() {
   client.stop();
   
   //set what to send back to arduino(get from website)
-  float set_humid = 58.00;
-  float set_temp = 37.00;
+  float set_humid = 68.50;
+  float set_temp = 36.90;
   int   set_light  = 1;
   int   set_humidifier = 0;
   int   set_tray =0;  
@@ -83,6 +87,6 @@ void loop() {
   String msg = String(set_humid)+"/"+String(set_temp)+"/"+String(set_light)+"/"+String(set_humidifier)+"/"+String(set_tray)+"/";
   const char *toArd = msg.c_str();
   commu.write(toArd);
-  delay(1000);
+  delay(5000);
 }  
 //----------------------------//

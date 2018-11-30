@@ -50,7 +50,7 @@ char fromEsp[18]; //Initialized variable to store recieved data from ESPino32
 
 /*Initiate part*/
 void setup(){
-  commu.begin(9600);          // Begin the commu Serial at 9600 Baud
+  commu.begin(115200);          // Begin the commu Serial at 9600 Baud
   dht.begin();                // Begin the dht sensor
   lcd.begin(20,4);            // Initiate the lcd for 16 chars 2 lines, turn on backlight
   pinMode(water, INPUT);      // set water as input
@@ -85,8 +85,8 @@ void loop(){
   float water_status = digitalRead(water);  // read water from water sensor
   
   /*Initialize setting for incubator, in case lost connect to ESPINO32*/
-  float maxHum = 58.00;           //max Humadity
-  float maxTemp = 37.00;          //max Temperature
+  float maxHum = 68.50;           //max Humadity
+  float maxTemp = 36.90;          //max Temperature
   int   tray_pos = 0;             //Tray position (0 off, 1 on)
   int   light_status = 1;         //light status (0 off, 1 on)
   int   humidifier_status = 1;    //humidifier status
@@ -125,11 +125,11 @@ void loop(){
   /*Control System*/
   check_temp(temp,maxTemp);
   /*Start to Control Humidity when temperature is stable*/
-  if(abs(temp-maxTemp)<0.50){
-     check_humid(hum,maxHum);
-  }else{
-     digitalWrite(humidifier,LOW);
-    }
+//  if(abs(temp-maxTemp)<0.50){
+  check_humid(hum,maxHum);
+//  }else{
+//     digitalWrite(humidifier,LOW);
+//    }
   egg_position(tray_pos); //turn egg tray
   light_status = digitalRead(light);                  //get light_status
   humidifier_status = digitalRead(humidifier);        //get humidifier_status
